@@ -12,6 +12,8 @@
 
 
 AABCharacterPlayer::AABCharacterPlayer()
+	: ArmLengthSpeed(3.0f)
+	, RotationSpeed(10.0f)
 {
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -63,6 +65,20 @@ void AABCharacterPlayer::BeginPlay()
 	
 	SetCharacterControl(CurrentCharacterControlType);
 }
+void AABCharacterPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (DestArmLength != CameraBoom->TargetArmLength)
+	{
+		CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, DestArmLength, DeltaTime, ArmLengthSpeed);
+	}
+
+	CameraBoom->SetRelativeRotation(FMath::RInterpTo(CameraBoom->GetRelativeRotation(), DestRelativeRotation, DeltaTime, RotationSpeed));
+	
+	UE_LOG(LogTemp, Warning, TEXT("Target Arm Length : %f"), CameraBoom->TargetArmLength);
+	UE_LOG(LogTemp, Warning, TEXT("Rotation : %s"), *CameraBoom->GetRelativeRotation().ToCompactString());
+
+}
 void AABCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -74,8 +90,6 @@ void AABCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(ShoulderMoveAction, ETriggerEvent::Triggered, this, &AABCharacterPlayer::ShoulderMove);
 	EnhancedInputComponent->BindAction(ShoulderLookAction, ETriggerEvent::Triggered, this, &AABCharacterPlayer::ShoulderLook);
 	EnhancedInputComponent->BindAction(QuaterMoveAction, ETriggerEvent::Triggered, this, &AABCharacterPlayer::QuaterMove);
-
-
 }
 
 void AABCharacterPlayer::ChangeCharacterControl()
@@ -116,13 +130,18 @@ void AABCharacterPlayer::SetCharacterControlData(const UABCharacterControlData* 
 {
 	Super::SetCharacterControlData(CharacterControlData);
 	
-	CameraBoom->TargetArmLength = CharacterControlData->TargetArmLength;
-	CameraBoom->SetRelativeRotation(CharacterControlData->RelativeRotation);
+	
+
+	// CameraBoom->TargetArmLength = CharacterControlData->TargetArmLength;
+	// CameraBoom->SetRelativeRotation(CharacterControlData->RelativeRotation);
 	CameraBoom->bUsePawnControlRotation = CharacterControlData->bUsePawnControlRotation;
 	CameraBoom->bInheritPitch = CharacterControlData->bInheritPitch;
 	CameraBoom->bInheritYaw = CharacterControlData->bInheritYaw;
 	CameraBoom->bInheritRoll = CharacterControlData->bInheritRoll;
 	CameraBoom->bDoCollisionTest = CharacterControlData->bDoCollisionTest;
+
+	DestArmLength = CharacterControlData->TargetArmLength;
+	DestRelativeRotation = CharacterControlData->RelativeRotation;
 }
 
 void AABCharacterPlayer::ShoulderMove(const FInputActionValue& Value)

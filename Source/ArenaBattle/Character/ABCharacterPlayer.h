@@ -21,6 +21,7 @@ protected:
 	// 입력 매핑 컨텍스트를 할당하는 역할
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaTime) override;
 public:
 	// 액션과 Move, Jump를 매핑
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)	override;
@@ -63,5 +64,15 @@ protected:
 
 	void QuaterMove(const FInputActionValue& Value);
 
+	FRotator DestRelativeRotation;
+
+	float DestArmLength;
+	
+	float ArmLengthSpeed;
+
+	float RotationSpeed;
+
 	ECharacterControlType CurrentCharacterControlType;
+
+
 };
