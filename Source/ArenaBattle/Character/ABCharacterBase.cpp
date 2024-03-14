@@ -32,13 +32,13 @@ AABCharacterBase::AABCharacterBase()
     GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
     GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
 
-    static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Quinn_Simple.SKM_Quinn_Simple'"));
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Cardboard.SK_CharM_Cardboard'"));
     if (CharacterMeshRef.Object)
     {
         GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
     }
 
-    static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceMeshRef(TEXT("/Game/Characters/Mannequins/Animations/ABP_Quinn.ABP_Quinn_C"));
+    static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceMeshRef(TEXT("/Game/ArenaBattle/Animation/ABP_ABCharacter.ABP_ABCharacter_C"));
     if (AnimInstanceMeshRef.Class)
     {
         GetMesh()->SetAnimInstanceClass(AnimInstanceMeshRef.Class);
