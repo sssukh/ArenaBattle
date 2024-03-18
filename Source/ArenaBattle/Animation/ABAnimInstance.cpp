@@ -12,6 +12,8 @@ UABAnimInstance::UABAnimInstance()
 	JumpingThreshold = 100.0f;
 }
 
+
+// 초기화
 void UABAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
@@ -24,6 +26,7 @@ void UABAnimInstance::NativeInitializeAnimation()
 	}
 }
 
+// 주기적으로 호출
 void UABAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
