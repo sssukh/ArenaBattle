@@ -12,6 +12,9 @@
 #include "CharacterStat/ABCharacterStatComponent.h"
 #include "UI/ABWidgetComponent.h"
 #include "UI/ABHpBarWidget.h"
+#include "Item/ABWeaponItemData.h"
+
+DEFINE_LOG_CATEGORY(LogABCharacter);
 
 // Sets default values
 AABCharacterBase::AABCharacterBase()
@@ -99,13 +102,25 @@ AABCharacterBase::AABCharacterBase()
         HpBar->SetDrawSize(FVector2D(150.0f, 15.0f));
         HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     }
+
+    // Item Actions
+    TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AABCharacterBase::EquipWeapon)));
+    TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AABCharacterBase::DrinkPotion)));
+    TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AABCharacterBase::ReadScroll)));
+
+    // Weapon Component
+    Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+    Weapon->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 }
 
-void AABCharacterBase::PostInitializeComponents()
+void AABCharacterBase::BeginPlay()
 {
-    Super::PostInitializeComponents();
+    Super::BeginPlay();
     Stat->OnHpZero.AddUObject(this, &AABCharacterBase::SetDead);
+
 }
+
+
 
 void AABCharacterBase::SetCharacterControlData(const UABCharacterControlData* CharacterControlData)
 {
@@ -221,7 +236,7 @@ void AABCharacterBase::AttackHitCheck()
 
     const float AttackRange = 40.0f;
     const float AttackRadius = 50.0f;
-    const float AttackDamage = 30.0f;
+    const float AttackDamage = 100.0f;
     // 투사의 시작지점
     const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
     // 투사의 끝지점
@@ -285,4 +300,43 @@ void AABCharacterBase::SetupCharacterWidget(UABUserWidget* InUserWidget)
         HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
         Stat->OnHpChanged.AddUObject(HpBarWidget, &UABHpBarWidget::UpdateHpBar);
     }
+}
+
+void AABCharacterBase::TakeItem(class UABItemData* InItemData)
+{
+    if (InItemData)
+    {
+        TakeItemActions[(uint8)InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
+    }
+}
+
+void AABCharacterBase::DrinkPotion(UABItemData* InItemData)
+{
+    UE_LOG(LogABCharacter, Log, TEXT("Drink Potion"));
+}
+
+void AABCharacterBase::ReadScroll(UABItemData* InItemData)
+{
+    UE_LOG(LogABCharacter, Log, TEXT("Read Scroll"));
+
+}
+
+void AABCharacterBase::EquipWeapon(UABItemData* InItemData)
+{
+    UABWeaponItemData* WeaponItemData = Cast<UABWeaponItemData>(InItemData);
+    if (InItemData)
+    {
+        if (WeaponItemData->WeaponMesh.IsPending())
+        {
+            WeaponItemData->WeaponMesh.LoadSynchronous();
+        }
+
+
+        Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh.Get());
+
+        // WeaponData의 Soft레퍼런싱 전 if 내부
+        // Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh);
+
+    }
+
 }

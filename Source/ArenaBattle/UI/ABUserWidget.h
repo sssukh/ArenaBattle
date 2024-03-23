@@ -13,7 +13,8 @@ UCLASS()
 class ARENABATTLE_API UABUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	public:
+	
+public:
 	FORCEINLINE void SetOwningActor(AActor* NewOwner) { OwningActor = NewOwner; }
 
 protected:
