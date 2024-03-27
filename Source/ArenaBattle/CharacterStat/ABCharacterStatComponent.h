@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameData/ABCharacterStat.h"
 #include "ABCharacterStatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
@@ -24,7 +25,12 @@ protected:
 public:
 	FOnHpZeroDelegate OnHpZero;
 	FOnHpChangedDelegate OnHpChanged;
-	FORCEINLINE float GetMaxHp() { return MaxHp; }
+
+	void SetLevelStat(int32 InNewLevel);
+	FORCEINLINE float GetCurrentLevel() const { return CurrentLevel; }
+	FORCEINLINE void SetModifierStat(const FABCharacterStat& InModifierStat) { ModifierStat = InModifierStat; }
+	FORCEINLINE FABCharacterStat GetTotalStat() const { return BaseStat + ModifierStat; }
+
 	FORCEINLINE float GetCurrentHp() { return CurrentHp; }
 	float ApplyDamage(float InDamage);
 
@@ -33,12 +39,16 @@ protected:
 	// Hp 변경
 	void SetHp(float NewHp);
 
-	UPROPERTY(VisibleInstanceOnly,Category = Stat)
-	float MaxHp;
-
 	//  값들은 디스크에 저장되는데 Transient라는 매크로를 통해서 불필요한 저장을 막을수 있다.
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float CurrentHp;
 
-		
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
+	float CurrentLevel;
+
+	UPROPERTY(Transient,VisibleInstanceOnly,Category =Stat , MEta = (AllowPrivateAccess = "true"))
+	FABCharacterStat BaseStat;
+
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, MEta = (AllowPrivateAccess = "true"))
+	FABCharacterStat ModifierStat;
 };
