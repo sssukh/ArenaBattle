@@ -61,6 +61,8 @@ protected:
 	// UAnimMontage 내부에 FOnMontageEnded라는 델리게이트가 있다. 그것의 파라미터와 맞춰준다.
 	void ComboActionEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
 
+	virtual void NotifyComboActionEnd();
+
 	void SetComboCheckTimer();
 	void ComboCheck();
 
