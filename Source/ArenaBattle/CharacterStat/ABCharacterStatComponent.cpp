@@ -9,23 +9,24 @@ UABCharacterStatComponent::UABCharacterStatComponent()
 {
 	CurrentLevel = 1;
 	AttackRadius = 50.0f;
+
+	bWantsInitializeComponent = true;
 }
 
 
-// Called when the game starts
-void UABCharacterStatComponent::BeginPlay()
+
+void UABCharacterStatComponent::InitializeComponent()
 {
-	Super::BeginPlay();
+	Super::InitializeComponent();
 
 	SetLevelStat(CurrentLevel);
 	SetHp(BaseStat.MaxHp);
-	
 }
 
 void UABCharacterStatComponent::SetLevelStat(int32 InNewLevel)
 {
 	CurrentLevel = FMath::Clamp(InNewLevel, 1, UABGameSingleton::Get().CharacterMaxLevel);
-	BaseStat = UABGameSingleton::Get().GetCharacterStat(CurrentLevel);
+	SetBaseStat(UABGameSingleton::Get().GetCharacterStat(CurrentLevel));
 	check(BaseStat.MaxHp > 0.0f);
 }
 
