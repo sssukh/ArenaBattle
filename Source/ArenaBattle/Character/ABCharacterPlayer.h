@@ -21,6 +21,7 @@ public:
 protected:
 	// 입력 매핑 컨텍스트를 할당하는 역할
 	virtual void BeginPlay() override;
+	virtual void SetDead() override;
 
 	virtual void Tick(float DeltaTime) override;
 public:

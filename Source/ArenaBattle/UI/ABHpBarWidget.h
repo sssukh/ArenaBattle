@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UI/ABUserWidget.h"
+#include "GameData/ABCharacterStat.h"
 #include "ABHpBarWidget.generated.h"
 
 /**
@@ -21,12 +22,19 @@ protected:
 	// 이 함수가 불릴 때에는 UI에 관련된 모든 기능들이 거의 초기화가 완료된 시점이다.
 	virtual void NativeConstruct()override;
 public:
-	FORCEINLINE void SetMaxHp(float NewMaxHp) { MaxHp = NewMaxHp; }
+	void UpdateStat(const FABCharacterStat& BaseStat, const FABCharacterStat& ModifierStat);
 	void UpdateHpBar(float NewCurrentHp);
+	FString GetHpStatText();
 
 protected:
 	UPROPERTY()
 	TObjectPtr<class UProgressBar>	HpProgressBar;
+
+	UPROPERTY()
+	TObjectPtr<class UTextBlock>	HpStat;
+
+	UPROPERTY()
+	float CurrentHp;
 
 	UPROPERTY()
 	float MaxHp;
