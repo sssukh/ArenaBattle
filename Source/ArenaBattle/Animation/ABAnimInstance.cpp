@@ -9,7 +9,7 @@
 UABAnimInstance::UABAnimInstance()
 {
 	MovingThreshold = 3.0f;
-	JumpingThreshold = 100.0f;
+	JumpingThreshold = 50.0f;
 }
 
 
@@ -40,3 +40,5 @@ void UABAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshold);
 	}
 }
+
+

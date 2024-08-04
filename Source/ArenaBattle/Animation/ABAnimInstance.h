@@ -53,4 +53,8 @@ protected:
 	// 점프중인지 확인하기위한 경계값
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	float JumpingThreshold;
+	
+	// 회피하는 중인지 나타내는 값
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
+	uint8 bIsDodging : 1;
 };

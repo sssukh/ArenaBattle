@@ -11,6 +11,10 @@
 #include "ABCharacterControlData.h"
 #include "UI/ABHUDWidget.h"
 #include "CharacterStat/ABCharacterStatComponent.h"
+#include "Interface/ABGameInterface.h"
+#include "Game/ABGameMode.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 
 AABCharacterPlayer::AABCharacterPlayer()
@@ -65,6 +69,20 @@ AABCharacterPlayer::AABCharacterPlayer()
 	}
 
 	CurrentCharacterControlType = ECharacterControlType::Quater;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionRollRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ArenaBattle/Input/Actions/IA_Roll.IA_Roll'"));
+	if (InputActionRollRef.Object)
+	{
+		RollAction = InputActionRollRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> RollActionMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/ArenaBattle/Animation/AM_Roll.AM_Roll'"));
+	if (RollActionMontageRef.Object)
+	{
+		RollActionMontage = RollActionMontageRef.Object;
+	}
+
+	RollSpeed = 2.0f;
 }
 
 void AABCharacterPlayer::BeginPlay()
@@ -87,6 +105,12 @@ void AABCharacterPlayer::SetDead()
 	if (PlayerController)
 	{
 		DisableInput(PlayerController);
+
+		IABGameInterface* ABGameMode = Cast<IABGameInterface>(GetWorld()->GetAuthGameMode());
+		if (ABGameMode)
+		{
+			ABGameMode->OnPlayerDead();
+		}
 	}
 }
 void AABCharacterPlayer::Tick(float DeltaTime)
@@ -99,8 +123,8 @@ void AABCharacterPlayer::Tick(float DeltaTime)
 
 	CameraBoom->SetRelativeRotation(FMath::RInterpTo(CameraBoom->GetRelativeRotation(), DestRelativeRotation, DeltaTime, RotationSpeed));
 	
-	UE_LOG(LogTemp, Warning, TEXT("Target Arm Length : %f"), CameraBoom->TargetArmLength);
-	UE_LOG(LogTemp, Warning, TEXT("Rotation : %s"), *CameraBoom->GetRelativeRotation().ToCompactString());
+	/*UE_LOG(LogTemp, Warning, TEXT("Target Arm Length : %f"), CameraBoom->TargetArmLength);
+	UE_LOG(LogTemp, Warning, TEXT("Rotation : %s"), *CameraBoom->GetRelativeRotation().ToCompactString());*/
 
 }
 void AABCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -115,6 +139,7 @@ void AABCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(ShoulderLookAction, ETriggerEvent::Triggered, this, &AABCharacterPlayer::ShoulderLook);
 	EnhancedInputComponent->BindAction(QuaterMoveAction, ETriggerEvent::Triggered, this, &AABCharacterPlayer::QuaterMove);
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AABCharacterPlayer::Attack);
+	EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Triggered, this, &AABCharacterPlayer::Roll);
 
 }
 
@@ -230,4 +255,19 @@ void AABCharacterPlayer::SetupHUDWidget(UABHUDWidget* InHUDWidget)
 		Stat->OnHpChanged.AddUObject(InHUDWidget, &UABHUDWidget::UpdateHpBar);
 
 	}
+}
+
+void AABCharacterPlayer::Roll()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(RollActionMontage, RollSpeed);
+	/*GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	FVector FwdVector = GetActorForwardVector();
+	GetCharacterMovement()->Launch(FwdVector*100);*/
+	/*
+	ACharacter* Char = Cast<ACharacter>(GetOwner());
+
+	check(Char);
+
+	Char->GetCharacterMovement()->AddForce(GetActorForwardVector());*/
 }

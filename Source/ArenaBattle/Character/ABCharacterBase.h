@@ -121,4 +121,7 @@ public:
 	void SetLevel(int32 InNewLevel);
 	void ApplyStat(const FABCharacterStat& BaseStat, const FABCharacterStat& ModifierStat);
 
+
+	
+
 };
